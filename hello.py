@@ -95,7 +95,7 @@ if sentence_raw:
         
         # st.markdown('Sentiment predictors are shown in bold:')
         # st.markdown(replace_all(sentence_raw, dic))
-        st.write('Top 100 sentiment predictor words in this sentence:', ', '.join(highlight_words))
+        st.write('Top sentiment predictor words in this sentence:', ', '.join(highlight_words))
     # st.plotly_chart(fig)
 
 st.markdown('_____________________________________________________________________________________')
