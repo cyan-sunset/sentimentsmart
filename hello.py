@@ -1,20 +1,21 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-import altair as alt
-import seaborn as sns
-import nltk
-import matplotlib.pyplot as plt
+# import numpy as np
+# import altair as alt
+# import seaborn as sns
+# import nltk
+# import matplotlib.pyplot as plt
 import plotly.express as px
-import re
+# import re
 import pickle
 import plotly.express as px
 from PIL import Image
-from wordcloud import WordCloud, STOPWORDS 
-from colorama import Fore, Back, Style
+# from wordcloud import WordCloud, STOPWORDS 
+# from colorama import Fore, Back, Style
+# from google.cloud import storage
 import gcsfs
-
 # page styling with css
+@st.cache(persist=True, suppress_st_warning=True)
 def local_css(file_name):
     with open(file_name) as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
@@ -26,18 +27,15 @@ logo = Image.open('SentimentSmart.jpg')
 pos = Image.open('pos.jpg')
 neg = Image.open('neg.jpg')
 neu = Image.open('neu.jpg')
+wordcloud = Image.open('covid-tweets.png')
 st.image(logo, use_column_width=True)
 
 # st.title('SentimentSmart')
 st.subheader('A text sentiment analysis tool.')
-# st.markdown(
-# """
-# ### A text sentiment analysis tool.
-# [See source code](https://github.com/streamlit/demo-uber-nyc-pickups/blob/master/app.py)
-# """)
+
 sentence_raw = st.text_input('Write a sentence here:') 
 
-fs = gcsfs.GCSFileSystem(project='my-first-project')
+fs = gcsfs.GCSFileSystem(project='sentimentsmart', token='anon')
 fs.ls('sentimentsmart-data')
 
 pickle_file = fs.open('sentimentsmart-data/sentiment.pkl')
@@ -99,9 +97,8 @@ if sentence_raw:
     # st.plotly_chart(fig)
 
 st.markdown('_____________________________________________________________________________________')
-st.title('SentimentSmart on COVID-19 tweets')
-
-st.markdown('### An analysis of sentiments by location')
+st.title('An analysis of COVID-19 tweets by location')
+st.subheader('Using SentimentSmart')
 
 option = st.selectbox('Please choose a location',('---', 'India', 'United States', 'New Delhi, India', 'London, England',
        'United Kingdom', 'Mumbai, India', 'Washington, DC',
@@ -139,52 +136,56 @@ if option != '---':
 
     st.plotly_chart(fig)
     
-    # Wordcloud
-    comment_words = '' 
-    stopwords = nltk.corpus.stopwords.words('english')
-    newstopwords = ['coronavirus','covid', '19', 'covid19', 'amp']
-    stopwords.extend(newstopwords)
+    # # Wordcloud
+    # comment_words = '' 
+    # stopwords = nltk.download('stopwords')
+    # newstopwords = ['coronavirus','covid', '19', 'covid19', 'amp']
+    # stopwords.extend(newstopwords)
 
-    mask = np.array(Image.open('./twitter2.jpg'))
+    # mask = np.array(Image.open('./twitter2.jpg'))
 
-    @st.cache
-    def one_color_func(word=None, font_size=None, 
-                    position=None, orientation=None, 
-                    font_path=None, random_state=None):
-        h = 200 # 0 - 360
-        s = 100 # 0 - 100
-        l = random_state.randint(30, 70) # 0 - 100
-        return "hsl({}, {}%, {}%)".format(h, s, l)
+    # @st.cache
+    # def one_color_func(word=None, font_size=None, 
+    #                 position=None, orientation=None, 
+    #                 font_path=None, random_state=None):
+    #     h = 200 # 0 - 360
+    #     s = 100 # 0 - 100
+    #     l = random_state.randint(30, 70) # 0 - 100
+    #     return "hsl({}, {}%, {}%)".format(h, s, l)
 
-    font_path = './coolvetica rg.ttf'
-    # iterate through the csv file 
-    for val in data.cleaned_tweets: 
+    # font_path = './coolvetica rg.ttf'
+    # # iterate through the csv file 
+    # for val in data.cleaned_tweets: 
         
-    # typecaste each val to string 
-        val = str(val) 
+    # # typecaste each val to string 
+    #     val = str(val) 
 
-        # split the value 
-        tokens = val.split() 
+    #     # split the value 
+    #     tokens = val.split() 
             
-        # Converts each token into lowercase 
-        for i in range(len(tokens)): 
-            tokens[i] = tokens[i].lower() 
+    #     # Converts each token into lowercase 
+    #     for i in range(len(tokens)): 
+    #         tokens[i] = tokens[i].lower() 
             
-        comment_words += " ".join(tokens)+" "
+    #     comment_words += " ".join(tokens)+" "
 
-    wordcloud = WordCloud(width = 1600, height = 1600, 
-                    background_color ='white', 
-                    mask=mask,
-                    font_path=font_path,
-                    stopwords = stopwords, 
-                    min_font_size = 10,
-                    color_func=one_color_func).generate(comment_words) 
+    # wordcloud = WordCloud(width = 1600, height = 1600, 
+    #                 background_color ='white', 
+    #                 mask=mask,
+    #                 font_path=font_path,
+    #                 stopwords = stopwords, 
+    #                 min_font_size = 10,
+    #                 color_func=one_color_func).generate(comment_words) 
 
-    # plot the WordCloud image                        
-    plt.figure(figsize = (15, 15), facecolor = None) 
-    plt.imshow(wordcloud) 
-    plt.axis("off") 
-    plt.tight_layout(pad = 0) 
+    # # plot the WordCloud image                        
+    # plt.figure(figsize = (15, 15), facecolor = None) 
+    # plt.imshow(wordcloud) 
+    # plt.axis("off") 
+    # plt.tight_layout(pad = 0) 
 
-    st.pyplot()
+    # st.pyplot()
+
+st.markdown('_____________________________________________________________________________________')
+st.subheader('Wordcloud from worldwide COVID-19 tweets')
+st.image(wordcloud, use_column_width=True)
 
